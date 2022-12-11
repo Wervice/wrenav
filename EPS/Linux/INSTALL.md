@@ -28,4 +28,14 @@ zypper in python-tk
 ## 2. Download
 Clone the respository from github.
 ```
-git clone https://www.github.com/wervice/wrenav/eps/linux/release.zip
+git clone https://github.com/Wervice/wrenav.git
+```
+## 3. Install
+Now go to EPS/Linux.  
+Next step is, to open up a terminal.
+Run this command in the terminal:
+```
+python3 install.py
+```
+## 4. Follow the installer
+Now, the installer will tell you everything and guide you to the end.
