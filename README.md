@@ -1,4 +1,6 @@
 # Wren Antivirus
+<div align="center"><img src="https://raw.githubusercontent.com/Wervice/wrenav/main/EPS/Linux/media/icon.ico" width=96></div>
+
 Wren Antivirus is going to be an open-source security all-rounder for every common os in the world. It will to support EPS, MDR and Firewalls for your IT infrastructure. Right now, it is just in the beginning. It will use ClamAV and MalwareBazaar to detect new and complicated malware fast and safe. Wren EPS also supports Live-Time-Protection and strong malware scans for Linux, MacOS and Windows.
 ## How fare is it now?
 + Stable GUI for Linux
