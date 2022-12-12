@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.ttk import *
 from ttkthemes import ThemedTk, ThemedStyle
 def error(subtitle, title, detail, font = "Ubuntu", multiple = False, buttonb = None):
-    window = ThemedTk(theme="yaru")
+    window = ThemedTk(theme="arc")
     window.title(title)
     window.resizable(False, False)
     window.geometry("400x300+200+200")
@@ -14,7 +14,7 @@ def error(subtitle, title, detail, font = "Ubuntu", multiple = False, buttonb = 
     window.mainloop()
 
 def info(subtitle, title, detail, multiple = False, buttonb = None):
-    window = ThemedTk(theme="yaru")
+    window = ThemedTk(theme="arc")
     window.title(title)
     window.resizable(False, False)
     window.geometry("400x300+200+200")
@@ -26,7 +26,7 @@ def info(subtitle, title, detail, multiple = False, buttonb = None):
     window.mainloop()
 
 def success(subtitle, title, detail, multiple = False, buttonb = None):
-    window = ThemedTk(theme="yaru")
+    window = ThemedTk(theme="arc")
     window.title(title)
     window.resizable(False, False)
     window.geometry("400x300+200+200")
@@ -38,7 +38,7 @@ def success(subtitle, title, detail, multiple = False, buttonb = None):
     window.mainloop()
 
 def warning(subtitle, title, detail, multiple = False, buttonb = None):
-    window = ThemedTk(theme="yaru")
+    window = ThemedTk(theme="arc")
     window.title(title)
     window.resizable(False, False)
     window.geometry("400x300+200+200")

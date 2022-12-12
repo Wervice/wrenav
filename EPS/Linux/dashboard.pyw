@@ -95,7 +95,7 @@ def main():
                 virus_found_f(viruses)
             else:
                 no_virus_found_f()
-        scan_window = ThemedTk(theme="yaru")
+        scan_window = ThemedTk(theme="arc")
         scan_window.title("Wren Antivirus - Virus Scan")
         scan_window.geometry("600x285+100+100")
         scan_window.configure(background = "white")
@@ -126,7 +126,7 @@ def main():
         window.destroy()
         os.system("python3 dashboard.pyw")
         log.done("Virus definitions update done")
-    window = ThemedTk(theme="yaru")
+    window = ThemedTk(theme="arc")
     window.title("Wren Antivirus Endpoint Security")
     window.geometry("600x285+100+100")
     window.wm_resizable(False, False)
