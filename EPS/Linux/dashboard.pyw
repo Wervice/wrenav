@@ -15,9 +15,12 @@ import requests
 import json
 import sys
 # sudo apt install clamav-cvdupdate
-if sys.platform != "linux" and sys.platform != "linux2":
-    wrenbox.error("You're not running Linux", title="Wrong Editon", detail="You're trying to run Wren Endpoint Security Linux Edition under Win32. This application won't work correctly under Windows. Please download Wren Endpoint Security Windows Edition.", font="Microsoft Sans Serif")
-    exit()
+
+# Check OS. If it's not linux, a message will appear.
+"""if sys.platform != "linux" and sys.platform != "linux2":
+    wrenbox.error("You're not running Linux", title="Wrong Editon", detail="You're trying to run Wren Endpoint Security Linux Edition under Win32 or OSX. This application won't work correctly under Windows or OSX. Please download the correct edition for your OS.", font="sans-serif")
+    exit()"""
+
 clam = clamd.ClamdUnixSocket()
 def scromve(path):
     i = 0
@@ -51,13 +54,13 @@ def malwarebazaar(file):
 def main():
     def m_scan():
         window.destroy()
-        def virus_found_f(malware):
-            wrenbox.warning(subtitle="The scan found a virus.", title="Virus found", detail="The file you scanned contains code of a virus.\n("+malware+")")
-        def no_virus_found_f():
-            wrenbox.info(subtitle="The scan found no virus.", title="No virus found", detail="The file you scanned contains no virus.\nIt's not found on MalwareBazaar or ClamAV.")
         def scn_file():
-            def virus_found_f(malware):
-                wrenbox.warning(subtitle="The scan found a virus.", title="Virus found", detail="The file you scanned contains code of a virus.\n("+malware+")")
+            log.info("Starting file scan now")
+            def virus_found_f(malware = "Unknown", file=""):
+                def remove():
+                    os.remove(file)
+                    wrenbox.info("File removed", title="File remove", detail="The virus is removed from your hard drive. You can close this window and the warning window now.")
+                wrenbox.warning(subtitle="The scan found a virus.", title="Virus found", detail="The file you scanned contains code of a virus.\n("+malware+")", multiple=True, buttonbdesc="Remove", buttonbcmd=remove)
             def no_virus_found_f():
                 wrenbox.info(subtitle="The scan found no virus.", title="No virus found", detail="The file you scanned contains no virus.\nIt's not found on MalwareBazaar or ClamAV.")
             path = filedialog.askopenfilename()
@@ -66,16 +69,21 @@ def main():
             clamavscan_bolean = (clamavscan[0] == 'OK') == False
             mbzaarscan_bolean = (mbzaarscan == 'file_not_found') == True
             if clamavscan_bolean and mbzaarscan_bolean:
-                virus_found_f(malware=clamavscan[1])
+                virus_found_f(malware=clamavscan[1], file=path)
             elif clamavscan_bolean:
-                virus_found_f(malware=clamavscan[1])
+                virus_found_f(malware=clamavscan[1], file=path)
             elif mbzaarscan_bolean:
-                virus_found_f()
+                virus_found_f(file=path)
             else:
                 no_virus_found_f()
         def scn_folder():
-            def virus_found_f(malware):
-                wrenbox.warning(subtitle="The scan found malware.", title="Virus found", detail="The folder you scanned contains malware"+malware)
+            log.info("Starting folder scan now")
+            def virus_found_f(malware = "Unknown", file=[""]):
+                def remove():
+                    for file in file:
+                        os.remove(file)
+                        wrenbox.info("File removed", title="File remove", detail="The virus is removed from your hard drive. You can close this window and the warning window now.")
+                wrenbox.warning(subtitle="The scan found viruses.", title="Virus found", detail="The files you scanned, contain malware.\n"+malware, multiple=True, buttonbdesc="Remove", buttonbcmd=remove)
             def no_virus_found_f():
                 wrenbox.info(subtitle="The scan found no virus.", title="No virus found", detail="The folder you scanned contains no virus.")
             dirname = filedialog.askdirectory()
@@ -92,9 +100,83 @@ def main():
                         viruses = viruses+"\n"+file+" ("+clamscanres[1]+")"
                         viruses_array += [file_path]
             if viruses != "":
-                virus_found_f(viruses)
+                virus_found_f(malware=viruses, file=viruses_array)
             else:
                 no_virus_found_f()
+        def scn_system():
+            log.info("Scanning system folders (bin;etc;var;lib;sys;usr;run)")
+            def virus_found_f(malware = "Unknown", file=[""]):
+                def remove():
+                    for file in file:
+                        os.remove(file)
+                        wrenbox.info("File removed", title="File remove", detail="The virus is removed from your hard drive. You can close this window and the warning window now.")
+                wrenbox.warning(subtitle="The scan found viruses.", title="Virus found", detail="The files you scanned, contain malware.\n"+malware, multiple=True, buttonbdesc="Remove", buttonbcmd=remove)
+            def no_virus_found_f():
+                wrenbox.info(subtitle="The scan found no virus.", title="No virus found", detail="The system you scanned contains no virus.")
+            def scn(dir):
+                dirname = dir
+                viruses = ""
+                viruses_array = [""]
+                for root, dirs, files in os.walk(dirname):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        clamscanres = clamscan(file_path)
+                        mbzaarscanres = malwarebazaar(file_path)
+                        if clamscanres[0] == "OK" and mbzaarscanres == "hash_not_found":
+                            pass
+                        else:
+                            viruses = viruses+"\n"+file+" ("+clamscanres[1]+")"
+                            viruses_array += [file_path]
+                if viruses != "":
+                    virus_found_f(malware=viruses, file=viruses_array)
+                else:
+                    pass
+                return viruses_array
+            # Scan for viruses in theese directories...
+            a = scn("/bin")
+            b = scn("/etc")
+            c = scn("/var")
+            d = scn("/lib")
+            e = scn("/sys")
+            f = scn("/usr")
+            g = scn("/run")
+            if a == [""] and b == [""] and c == [""] and d == [""] and e == [""] and f == [""] and g == [""]:
+                no_virus_found_f()
+        def scn_full():
+            log.info("Scanning whole system")
+            def virus_found_f(malware = "Unknown", file=[""]):
+                def remove():
+                    for file in file:
+                        os.remove(file)
+                        wrenbox.info("File removed", title="File remove", detail="The virus is removed from your hard drive. You can close this window and the warning window now.")
+                wrenbox.warning(subtitle="The scan found viruses.", title="Virus found", detail="The files you scanned, contain malware.\n"+malware, multiple=True, buttonbdesc="Remove", buttonbcmd=remove)
+            def no_virus_found_f():
+                wrenbox.info(subtitle="The scan found no virus.", title="No virus found", detail="The system you scanned contains no virus.")
+            def scn(dir):
+                dirname = dir
+                viruses = ""
+                viruses_array = [""]
+                for root, dirs, files in os.walk(dirname):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        clamscanres = clamscan(file_path)
+                        mbzaarscanres = malwarebazaar(file_path)
+                        if clamscanres[0] == "OK" and mbzaarscanres == "hash_not_found":
+                            pass
+                        else:
+                            viruses = viruses+"\n"+file+" ("+clamscanres[1]+")"
+                            viruses_array += [file_path]
+                if viruses != "":
+                    virus_found_f(malware=viruses, file=viruses_array)
+                else:
+                    pass
+                return viruses_array
+            # Scan for viruses in theese directories...
+            a = scn("/")
+            if a == [""]:
+                no_virus_found_f()
+        def scn_fdis():
+            pass
         scan_window = ThemedTk(theme="arc")
         scan_window.title("Wren Antivirus - Virus Scan")
         scan_window.geometry("600x285+100+100")
@@ -108,9 +190,9 @@ def main():
         Label(master=scan_window, text="Autoremove all viruses from this system, when found.", font=('Ubuntu', 12), background="white").place(x=160, y=245)
         Button(master=scan_window, width=12, text="Scan File", command=scn_file).place(x=10, y=60)
         Button(master=scan_window, width=12, text="Scan Folder", command=scn_folder).place(x=10, y=105)
-        Button(master=scan_window, width=12, text="Scan System", command=scn_file).place(x=10, y=150)
-        Button(master=scan_window, width=12, text="Full Scan", command=scn_file).place(x=10, y=195)
-        Button(master=scan_window, width=12, text="Full Desinfect", command=scn_file).place(x=10, y=240)
+        Button(master=scan_window, width=12, text="Scan System", command=scn_system).place(x=10, y=150)
+        Button(master=scan_window, width=12, text="Full Scan", command=scn_full).place(x=10, y=195)
+        Button(master=scan_window, width=12, text="Full Desinfect", command=scn_fdis).place(x=10, y=240)
     def m_fsafe():
         pass
     def m_firewall():

@@ -32,9 +32,10 @@ def malwarebazaar(file):
     except FileNotFoundError:
         restring = ""
     return restring
-def virus_found_f(malware, file):
-            wrenbox.warning(subtitle="The scan found a virus.", title="Virus found", detail="Wren EPS Linux Edition found malware in "+file+".\n("+malware+")")
-            # reaction.cry(malware=malware)
+def virus_found_f(malware = "Unknown", file=""):
+                def remove():
+                    os.remove(file)
+                wrenbox.warning(subtitle="The scan found a virus.", title="Virus found", detail="The file you scanned contains code of a virus.\n("+malware+")", multiple=True, buttonbdesc="Remove", buttonbcmd=remove)
 class Event(LoggingEventHandler):
     def on_created(self, event):
         print("Scanning...")
